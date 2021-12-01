@@ -1,0 +1,54 @@
+*, *::after, *::before {
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    background-color: seashell;
+}
+
+.game-ui {
+    background-color: rgb(64, 61, 236);
+    min-width: 400px;
+    min-height: 400px;
+    text-align: center;
+    z-index: 1;
+}
+
+.container-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+td[data-index] {
+    background-color: rgb(129, 148, 206);
+    font-size: 22px;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    height: 100px;
+    width: 100px;
+}
+
+.turn-anouncer {
+    position: absolute;
+    font-size: 25px;
+    font-weight: 700;
+    font-family: monospace, Arial, Helvetica, sans-serif;
+    left: 50%;
+    top: 120px;
+    transform: translate(-50%, 0);
+    z-index: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
