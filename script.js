@@ -36,18 +36,36 @@ let Gameboard = (() => {
         //console.log(gameboard)
     }
 
-    return {gameboard, checkForWin, checkForDraw, reset};
+    function change(index, mark) {
+        gameboard[index] = mark;
+    }
+
+    function checkEmptiness(index) {
+        if (gameboard[index] === undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function getGameboard() {
+        return gameboard
+    }
+
+    return {change, checkForWin, checkForDraw, reset, getGameboard, checkEmptiness};
 })()
 
 // for creating a player object and then creating a list of players for later use
 let Player = function(mark) {
 
-    function play(x, gameboard) {
-        if (gameboard[x] === undefined || gameboard === '') {
-            gameboard[x] = mark;
+    function play(index) {
+        if (Gameboard.checkEmptiness(index)) {
+            Gameboard.change(index, mark);
+            return true;
+        } else {
+            return false;
         }
     }
-
     return {play, mark};
 }
 
@@ -56,7 +74,7 @@ let player2 = Player('O');
 let players = [player1, player2]
 
 //a game controller
-let turn = ((players) => {
+let turn = (() => {
     let player = players[0];
 
     function next() {
@@ -67,8 +85,16 @@ let turn = ((players) => {
         }
     }
 
-    return {player, next}
-}) (players);
+    function reset() {
+        player = players[0];
+    }
+
+    function getCurrentPlayer() {
+        return player
+    }
+
+    return {getCurrentPlayer, next, reset}
+}) ();
 
 
 let gameUi = document.querySelector('.game-ui');
@@ -81,19 +107,31 @@ function renderUi(gameboard) {
     })
     //console.log(gameboard);
 }
-renderUi(Gameboard.gameboard);
+renderUi(Gameboard.getGameboard());
 
 spaces.forEach(space => {
     space.addEventListener('click', event => {
-        turn.player.play(event.target.getAttribute('data-index'), Gameboard.gameboard);
-        renderUi(Gameboard.gameboard);
-        console.log(Gameboard.gameboard)
+        let played = turn.getCurrentPlayer().play(event.target.getAttribute('data-index'));
+        renderUi(Gameboard.getGameboard());
+        //console.log(Gameboard.gameboard);
+        //console.log(Gameboard.gameboard);
         //console.log(event.target.getAttribute('data-index'))
-        if (Gameboard.checkForWin(turn.player.mark)) {
-            Gameboard.reset()
+        if (Gameboard.checkForWin(turn.getCurrentPlayer().mark)) {
+            console.log('win');
+            Gameboard.reset();
+            setTimeout(renderUi, 5000, Gameboard.getGameboard());
+            turn.reset()
+            //console.log(Gameboard.gameboard);
         } else if (Gameboard.checkForDraw()) {
-            Gameboard.reset()
+            console.log('draw');
+            Gameboard.reset();
+            setTimeout(renderUi, 5000, Gameboard.getGameboard());
+            turn.reset()
+            //console.log(Gameboard.gameboard);
+        } else {
+            if (played) {
+                turn.next();
+            }
         }
-        turn.next()
     })
 })
