@@ -60,19 +60,15 @@ let turn = ((players) => {
     let player = players[0];
 
     function next() {
-        if (player == players[0]) {
+        if (player === players[0]) {
             player = players[1];
         } else {
             player = players[0];
         }
     }
 
-    function play(x) {
-        player.play(x, Gameboard.gameboard);
-    }
-
-    return {player, play, next};
-}) (players, Gameboard.gameboard);
+    return {player, next}
+}) (players);
 
 
 let gameUi = document.querySelector('.game-ui');
@@ -88,31 +84,16 @@ function renderUi(gameboard) {
 renderUi(Gameboard.gameboard);
 
 spaces.forEach(space => {
-
-    function check() {
-        if (Gameboard.checkForWin(turn.player.mark)) {
-            Gameboard.gameboard = []
-            renderUi(Gameboard.gameboard);
-            console.log('win!')
-            //console.log(turn.player.mark)
-            console.log(Gameboard.gameboard)
-        } else if (Gameboard.checkForDraw()) {
-            Gameboard.reset()
-            renderUi(Gameboard.gameboard);
-            console.log('draw');
-            console.log(Gameboard.gameboard);
-        } else {
-            //console.log('play');
-            //console.log(Gameboard.gameboard);
-        }
-    }
-
     space.addEventListener('click', event => {
-        turn.play(event.target.getAttribute('data-index'));
+        turn.player.play(event.target.getAttribute('data-index'), Gameboard.gameboard);
         renderUi(Gameboard.gameboard);
         console.log(Gameboard.gameboard)
         //console.log(event.target.getAttribute('data-index'))
-        check();
+        if (Gameboard.checkForWin(turn.player.mark)) {
+            Gameboard.reset()
+        } else if (Gameboard.checkForDraw()) {
+            Gameboard.reset()
+        }
         turn.next()
     })
 })
