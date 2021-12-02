@@ -100,6 +100,8 @@ let turn = (() => {
 let gameUi = document.querySelector('.game-ui');
 let spaces = document.querySelectorAll('td[data-index]');
 
+//rendering the gameboard to the 
+
 function renderUi(gameboard) {
     spaces.forEach(space => {
         //console.log(gameboard[space.getAttribute('data-index')])
@@ -109,8 +111,29 @@ function renderUi(gameboard) {
 }
 renderUi(Gameboard.getGameboard());
 
+// starting ui functionality
+let startingUi = document.querySelector('.starting-ui');
+let nameInputs = startingUi.querySelectorAll('.name-input');
+let playButton = startingUi.querySelector('.submit');
+let turnAnouncer = document.querySelector('.turn-anouncer')
+let player1Name = document.querySelector('.player1-name');
+let player2Name = document.querySelector('.player2-name');
+let errorMessage = startingUi.querySelector('.error');
+
+playButton.onclick = function() {
+    if (nameInputs[0].value === '' || nameInputs[1].value === '') {
+        errorMessage.textContent = "you need to enter both names";
+        return;
+    }
+    player1Name.textContent = `X : ${nameInputs[0].value}`;
+    player2Name.textContent = `O : ${nameInputs[1].value}`;
+    turnAnouncer.textContent = 'X';
+    startingUi.remove()
+};
+
 spaces.forEach(space => {
-    space.addEventListener('click', event => {
+    space.addEventListener('click', (event) => {
+        //console.log(this)
         let played = turn.getCurrentPlayer().play(event.target.getAttribute('data-index'));
         renderUi(Gameboard.getGameboard());
         //console.log(Gameboard.gameboard);
@@ -119,19 +142,63 @@ spaces.forEach(space => {
         if (Gameboard.checkForWin(turn.getCurrentPlayer().mark)) {
             console.log('win');
             Gameboard.reset();
-            setTimeout(renderUi, 5000, Gameboard.getGameboard());
+            setTimeout(renderUi, 1000, Gameboard.getGameboard());
             turn.reset()
             //console.log(Gameboard.gameboard);
         } else if (Gameboard.checkForDraw()) {
             console.log('draw');
             Gameboard.reset();
-            setTimeout(renderUi, 5000, Gameboard.getGameboard());
-            turn.reset()
+            setTimeout(renderUi, 1000, Gameboard.getGameboard());
+            turn.reset();
             //console.log(Gameboard.gameboard);
         } else {
             if (played) {
                 turn.next();
+                if (turnAnouncer.textContent === 'X') {
+                    turnAnouncer.textContent = 'O';
+                } else {
+                    turnAnouncer.textContent = 'X';
+                }
             }
         }
     })
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
