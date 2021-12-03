@@ -112,27 +112,77 @@ function renderUi(gameboard) {
 renderUi(Gameboard.getGameboard());
 
 // starting ui functionality
-let startingUi = document.querySelector('.starting-ui');
-let nameInputs = startingUi.querySelectorAll('.name-input');
-let playButton = startingUi.querySelector('.submit');
-let turnAnouncer = document.querySelector('.turn-anouncer')
-let player1Name = document.querySelector('.player1-name');
-let player2Name = document.querySelector('.player2-name');
-let errorMessage = startingUi.querySelector('.error');
+let uiInfo = function() {
+    let startingUi = document.querySelector('.starting-ui');
+    let nameInputs = startingUi.querySelectorAll('.name-input');
+    let playButton = startingUi.querySelector('.submit');
+    let turnAnouncer = document.querySelector('.turn-anouncer');
+    let errorMessage = startingUi.querySelector('.error');
+    let finishingUi = document.querySelector('.finishing-ui');
+    let winnerAnouncer = finishingUi.querySelector('.winner-anouncer');
+    let resetButton = finishingUi.querySelector('.restart-button');
+    let player1Name;
+    let player2Name;
 
-playButton.onclick = function() {
-    if (nameInputs[0].value === '' || nameInputs[1].value === '') {
-        errorMessage.textContent = "you need to enter both names";
-        return;
+    playButton.onclick = function() {
+        if (nameInputs[0].value === '' || nameInputs[1].value === '') {
+            errorMessage.textContent = "you need to enter both names";
+            return;
+        }
+        player1Name = nameInputs[0].value;
+        player2Name = nameInputs[1].value;
+        document.querySelector('.player1-name').textContent = `X : ${player1Name}`;
+        document.querySelector('.player2-name').textContent = `O : ${player2Name}`;
+        turnAnouncer.textContent = 'X';
+        startingUi.remove();
+    };
+
+    function anounceNext() {
+        if (turnAnouncer.textContent === 'X') {
+            turnAnouncer.textContent = 'O';
+        } else {
+            turnAnouncer.textContent = 'X';
+        }
     }
-    player1Name.textContent = `X : ${nameInputs[0].value}`;
-    player2Name.textContent = `O : ${nameInputs[1].value}`;
-    turnAnouncer.textContent = 'X';
-    startingUi.remove()
-};
 
-spaces.forEach(space => {
-    space.addEventListener('click', (event) => {
+    function getPlayer1Name() {
+        return player1Name;
+    }
+
+    function getPlayer2Name() {
+        return player2Name;
+    }
+
+    function showFinishingUi() {
+        finishingUi.classList.add('active');
+    }
+
+    function anounceWinner(name) {
+        winnerAnouncer.textContent = `Winner is : ${name}`;
+    }
+
+    //adding restart button functionality
+    resetButton.addEventListener('click',() => {
+        gameFlow.activeGame();
+        finishingUi.classList.remove('active');
+    })
+
+    
+
+    return {getPlayer1Name, getPlayer2Name, anounceNext, showFinishingUi, anounceWinner};
+} ()
+
+//controling the activation or deactivation of gameboard
+
+let gameFlow = (() => { 
+    let turnAnouncer = document.querySelector('.turn-anouncer');
+    function activeGame() {
+        spaces.forEach(space => {
+            space.addEventListener('click', gameplay, {once: true})
+        })
+    }
+    function gameplay(event) {
+        let winner;
         //console.log(this)
         let played = turn.getCurrentPlayer().play(event.target.getAttribute('data-index'));
         renderUi(Gameboard.getGameboard());
@@ -140,32 +190,50 @@ spaces.forEach(space => {
         //console.log(Gameboard.gameboard);
         //console.log(event.target.getAttribute('data-index'))
         if (Gameboard.checkForWin(turn.getCurrentPlayer().mark)) {
-            console.log('win');
+            turnAnouncer.textContent = 'X';
+            //console.log('win');
             Gameboard.reset();
             setTimeout(renderUi, 1000, Gameboard.getGameboard());
-            turn.reset()
+            deactiveGame();
+            uiInfo.showFinishingUi();
+            if (turn.getCurrentPlayer().mark === 'X'){
+                console.log(uiInfo.getPlayer1Name());
+                uiInfo.anounceWinner(uiInfo.getPlayer1Name());
+            } else {
+                console.log(uiInfo.getPlayer2Name());
+                uiInfo.anounceWinner(uiInfo.getPlayer2Name());
+            }
+            turn.reset();
             //console.log(Gameboard.gameboard);
         } else if (Gameboard.checkForDraw()) {
-            console.log('draw');
+            turnAnouncer.textContent = 'X';
+            //console.log('draw');
             Gameboard.reset();
             setTimeout(renderUi, 1000, Gameboard.getGameboard());
+            deactiveGame();
+            uiInfo.showFinishingUi();
+            uiInfo.anounceWinner()
             turn.reset();
             //console.log(Gameboard.gameboard);
         } else {
             if (played) {
                 turn.next();
-                if (turnAnouncer.textContent === 'X') {
-                    turnAnouncer.textContent = 'O';
-                } else {
-                    turnAnouncer.textContent = 'X';
-                }
+                uiInfo.anounceNext();
             }
         }
-    })
-})
+    }
 
-
-
+    activeGame()
+    
+    //making the gameboard inactive
+    
+    function deactiveGame() {
+        spaces.forEach(space => {
+            space.removeEventListener('click', gameplay, {once: true})
+        })
+    }
+    return {activeGame, deactiveGame}
+}) ()
 
 
 
