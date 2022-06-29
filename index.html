@@ -1,52 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Tic Tac Toe</title>
-        <link href="style.css" rel="stylesheet">
-        <script src="script.js" defer></script>
-    </head>
-    <body>
-        <p class="turn-anouncer ui">your turn</p>
-        <p class="player1-name ui player-name">X : Alireza</p>
-        <p class="player2-name ui player-name">O : AmirMohammad</p>
-        <div class="container-all">
-            <table class="game-ui">
-                <tr>
-                    <td data-index="0">X</td>
-                    <td data-index="1">X</td>
-                    <td data-index="2">X</td>
-                </tr>
-                <tr>
-                    <td data-index="3">O</td>
-                    <td data-index="4">X</td>
-                    <td data-index="5">X</td>
-                </tr>
-                <tr>
-                    <td data-index="6">O</td>
-                    <td data-index="7">X</td>
-                    <td data-index="8">X</td>
-                </tr>
-            </table>
-        </div>
-        <div class="starting-ui">
-            <div class="form">
-                <input class="form-input name-input" placeholder="player X name:">
-                <input class="form-input name-input" placeholder="player O name:">               
-                <button class="form-input submit">Play</button>
-            </div class="form">
-            <p class="error" style="color: red;"></p>
-        </div>
-        <div class="finishing-ui">
-            <p class="winner-anouncer"></p>
-            <button class="restart-button">restart</button>
-        </div>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header><h1>Tic-Tac-Toe</h1></header>
+    <main class="main-content">
+      <div class="labels">
+        <div class="x-player">X:</div>
+        <div class="o-player">O:</div>
+      </div>
+      <div class="game"></div>
+      <button type="button" class="reset">RESET</button>
+    </main>
+  </div>
+</body>
 </html>
-
-
-
-
-
-

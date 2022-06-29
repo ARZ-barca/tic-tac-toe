@@ -1,123 +1,64 @@
-*, *::after, *::before {
-    box-sizing: border-box;
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-html, body{
-    height: 100%;
-    background-color: seashell;
+:root {
+  --gameboard-width-height: min(100vh, 400px);
+  --header-height: 100px;
+  --labels-height: 50px;
 }
 
-.game-ui {
-    background-color: rgb(64, 61, 236);
-    min-width: 400px;
-    min-height: 400px;
-    text-align: center;
-    z-index: 1;
+/*
+    structure
+*/
+
+.page {
+  min-height: 100vh;
 }
 
-.container-all {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+header h1 {
+  height: var(--header-height);
+  background-color: aqua;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-td[data-index] {
-    background-color: rgb(129, 148, 206);
-    font-size: 22px;
-    font-family:Georgia, 'Times New Roman', Times, serif;
-    height: 100px;
-    width: 100px;
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
 }
 
-.ui {
-    font-size: 25px;
-    font-weight: 700;
-    font-family: monospace, Arial, Helvetica, sans-serif;
-    z-index: 0;
+.labels {
+  width: var(--gameboard-width-height);
+  height: var(--labels-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.turn-anouncer {
-    position: absolute;
-    left: 50%;
-    top: 120px;
-    transform: translate(-50%, 0);
-    text-decoration: underline;
-    text-decoration-thickness: 5px;
+.game {
+  width: var(--gameboard-width-height);
+  height: var(--gameboard-width-height);
+  background-color: red;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
 }
 
-.player-name {
-    top: 40%;
-    background-color: salmon;
-    padding: 10px 20px;
-    border: 4px solid red;
-    border-radius: 5px;
+.game-block {
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.player1-name {
-    position: absolute;
-    left: 200px;
-}
 
-.player2-name {
-    position: absolute;
-    right: 200px;
-}
 
-.starting-ui {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-color: rosybrown;
-    top: 0;
-    left: 0;
-    z-index: 2;
-}
 
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
 
-.form-input {
-    width: 210px;
-    height: 65px;
-    font-size: 25px;
-}
-.finishing-ui {
-    background-color: rosybrown;
-    width: 200px;
-    padding: 30px;
-    transform: scale(0);
-    position: fixed;
-    border: 5px solid beige;
-    left: 50%;
-    top: 50%;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-}
 
-.winner-anouncer {
-    font-size: larger;
-    color: gold;
-    text-align: center;
-}
-
-.restart-button {
-    padding: 15px;
-}
-
-.restart-button:hover {
-    background-color: rgb(25, 180, 25);
-}
-
-.active {
-    transform: translate(-50%, -50%) scale(1.5);
-    transition: all 2s;
-}
