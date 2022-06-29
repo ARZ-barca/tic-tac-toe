@@ -1,105 +1,142 @@
-//   create a game object so we can have all the play functions and win checking in it
 const gameObj = (() => {
-  
-  let gameArray = []
-  let player_x;
-  let player_o;
-  let turn;
   const game = document.querySelector('.game')
+  let gameBlocksArray;
+  let gameArray = [];
 
-  //function for changing the turn
-  function nextTurn() {
-    if (turn === player_x) {
-      turn = player_o
-    } else if (turn === player_o) {
-      turn = player_x
+  // an object for determining the turn
+  const turn = {mark: 'X', next() {
+    if (this.mark === 'X') {
+      this.mark = 'O'
+    } else if (this.mark === 'O') {
+      this.mark = 'X'
     }
-  }
+  }}
 
-  // reset te game array whenever nedded
-  function resetGameArray() {
-    gameArray = []
-    for (let i = 0; i < 9; i++ ) {
-      gameArray.push('')
-    }
-  }
-
-  // initialize the game array and game obj
-  let initTheGame = () => {
-    resetGameArray()
-    turn = player_x;
+  // fill the game object with game blocks and fill the game array with empty string
+  let init = () => {
     for (let i = 0; i < 9; i++) {
       let gameBlock = document.createElement('div')
-      gameBlock.classList.add('game-block', `block-${i}`)
-      gameBlock.textContent = gameArray[i]
+      gameBlock.classList.add('game-block')
+      gameBlock.setAttribute('data-index', `${i}`)
       game.appendChild(gameBlock)
-      gameBlock.addEventListener('click', function(e) {
-        play(e.target, i)
-      }, {once: true})
+      gameArray.push('')
+    }
+    gameBlocksArray = [...document.querySelectorAll('.game-block')]
+  }
+
+  // adds event listener to game blocks
+  let addEventListeners = () => {
+    turn.mark = 'X'
+    for (let i = 0; i < 9; i++) {
+      let gameBlock = gameBlocksArray[i]
+      gameBlock.addEventListener('click', clickPlay, {once: true})
     }
   }
 
-  function play(gameBlock, index) {
-    gameBlock.textContent = turn.mark
-    gameArray[index] = turn.mark
-    nextTurn()
+  function clickPlay(e) {
+    play(+(e.target.getAttribute('data-index')))
   }
 
-  // player factory function
-  function Player(name, type) {
-    return {name, type}
+  // plays an ai move
+  let aiPlay = (move) => {
+    play(move)
+    gameBlocksArray[move].removeEventListener('click', clickPlay, {once: true})
+  }
+
+  function play(move) {
+    let block = gameBlocksArray[move]
+    block.textContent = turn.mark
+    gameArray[move] = turn.mark
+    let result = check(game);
+    if (result) {
+      endGame(result)
+    }
+    turn.next() 
+  }
+
+  // check for win or draw
+  let check =  () => {
+    // horizontal check
+    if (gameArray[0] === gameArray[1] && gameArray[0] === gameArray[2] && gameArray[0] !== '') return gameArray[0];
+    if (gameArray[3] === gameArray[4] && gameArray[3] === gameArray[5] && gameArray[3] !== '') return gameArray[3];
+    if (gameArray[6] === gameArray[7] && gameArray[6] === gameArray[8] && gameArray[6] !== '') return gameArray[6];
+    // vertical check
+    if (gameArray[0] === gameArray[3] && gameArray[0] === gameArray[6] && gameArray[0] !== '') return gameArray[0];
+    if (gameArray[1] === gameArray[4] && gameArray[1] === gameArray[7] && gameArray[1] !== '') return gameArray[1];
+    if (gameArray[2] === gameArray[5] && gameArray[2] === gameArray[8] && gameArray[2] !== '') return gameArray[2];
+    // diagonal check
+    if (gameArray[0] === gameArray[4] && gameArray[0] === gameArray[8] && gameArray[0] !== '') return gameArray[0];
+    if (gameArray[2] === gameArray[4] && gameArray[2] === gameArray[6] && gameArray[2] !== '') return gameArray[2];
+
+    let draw = true;
+    for (let i = 0; i < 9; i++) {
+      if (gameArray[i] === '') {
+        draw = false;
+      }
+    }
+    if (draw) return 'draw';
+    return false;
+  }
+
+  // returns empty indexes of the gameArray
+  let getEmptyIndexes = () => {
+    let emptyIndexes = []
+    for (let i = 0; i < 9; i++) {
+      if (gameArray[i] === '') {
+        emptyIndexes.push(i)
+      }
+    }
+  }
+  
+  return {init, addEventListeners, aiPlay, check, getEmptyIndexes}
+}) ()
+
+const players = (() => {
+
+  let player_x, player_o;
+
+  // a function to create human player
+  let HumanPlayer = (name) => {
+    return {name}
   }
 
 
-  function setPlayerX(name, type) {
-    player_x = Player(name, type)
-    player_x.mark = 'X'
+  // functions to set x and o players
+  function setXplayer(player) {
+    player_x = player
   }
 
-  function setPlayerO(name, type) {
-    player_o = Player(name, type)
-    player_o.mark = 'O'
+  function setOplayer(player) {
+    player_o = player
   }
 
-  setPlayerX('Alireza', 'p')
-  setPlayerO('amir', 'p')
-  /*
-  // play a move with given mark
-  let play = (mark, index) => {
-    gameArray[index] = mark
-    let gameBlock = game.querySelector(`:nth-child(${index + 1})`)
-    gameBlock.textContent = mark
+  function createAi(name, algo) {
+    return {name, algo}
   }
-  */
 
+  function loserAlgo(emptyIndexes) {
+    
+  }
 
-  return {initTheGame}
-})()
+  return {HumanPlayer, setXplayer, setOplayer}
+}) ()
 
-gameObj.initTheGame()
+let player1 = players.HumanPlayer('alireza')
+let player2 = players.HumanPlayer('amir')
 
+function runGame() {
+  document.querySelector('.game').innerHTML = ''
+  gameObj.init()
+  gameObj.addEventListeners()
+  players.setXplayer(player1)
+  players.setOplayer(player2)
+}
 
+runGame()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function endGame(result) {
+  console.log(result)
+}
 
 
 
