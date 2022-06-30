@@ -14,6 +14,7 @@ const gameObj = (() => {
 
   // fill the game object with game blocks and fill the game array with empty string
   let init = () => {
+    gameArray = []
     for (let i = 0; i < 9; i++) {
       let gameBlock = document.createElement('div')
       gameBlock.classList.add('game-block')
@@ -49,7 +50,7 @@ const gameObj = (() => {
     gameArray[move] = turn.mark
     let result = check(game);
     if (result) {
-      endGame(result)
+      main.endGame(result)
     }
     turn.next() 
   }
@@ -121,24 +122,45 @@ const players = (() => {
   return {HumanPlayer, setXplayer, setOplayer}
 }) ()
 
-let player1 = players.HumanPlayer('alireza')
-let player2 = players.HumanPlayer('amir')
+let main = (() => {
+  let player1 = players.HumanPlayer('alireza')
+  let player2 = players.HumanPlayer('amir')
 
-function runGame() {
-  document.querySelector('.game').innerHTML = ''
-  gameObj.init()
-  gameObj.addEventListeners()
-  players.setXplayer(player1)
-  players.setOplayer(player2)
-}
+  function runGame() {
+    let game = document.querySelector('.game')
+    game.innerHTML = ''
+    gameObj.init()
+    gameObj.addEventListeners()
+    players.setXplayer(player1)
+    players.setOplayer(player2)
+    let resultDiv = document.createElement('div')
+    resultDiv.classList.add('result');
+    game.appendChild(resultDiv)
+    resultDiv.textContent = 'aaa'
+  }
 
-runGame()
+  function endGame(result) {
+    let game = document.querySelector('.game')
+    let resultDiv = document.querySelector('.result')
+    resultDiv.classList.add('show')
+    if (result === 'draw') {
+      resultDiv.textContent = 'draw'
+    } else if (result === 'X') {
+      resultDiv.textContent = 'X won!'
+    } else if (result === 'O') {
+      resultDiv.textContent = 'O won!'
+    }
+  }
 
-function endGame(result) {
-  console.log(result)
-}
+  let resetButton = document.querySelector('.reset')
+  resetButton.addEventListener('click', (e) => {
+    runGame()
+  })
 
+  return {runGame, endGame}
+}) ()
 
+main.runGame()
 
 
 
