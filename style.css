@@ -33,6 +33,10 @@ header h1 {
   gap: 30px;
 }
 
+/*
+    labels
+*/
+
 .labels {
   width: var(--gameboard-width-height);
   height: var(--labels-height);
@@ -40,6 +44,57 @@ header h1 {
   justify-content: space-between;
   align-items: center;
 }
+
+/*
+    player names
+*/
+
+.player {
+  width: 130px;
+  height: var(--labels-height);
+  text-align: center;
+  line-height: var(--labels-height);
+  border: 1px solid black;
+  position: relative;
+}
+
+.selection {
+  position: absolute;
+  top: calc(var(--labels-height) - 2px);
+  left: -1px;
+  width: calc(100% + 2px);
+  border: 1px solid black;
+  z-index: 2;
+  display: none;
+}
+
+.player.active:hover .selection {
+  display: block;
+}
+
+.labels li {
+  list-style-type: none;  
+}
+
+.labels input {
+  width: 100%;
+  height: var(--labels-height);
+  border: none;
+  padding: 5px;
+  text-align: center;
+}
+
+.labels input:focus {
+  outline: none;
+}
+
+.randy {
+  background-color: aqua;
+}
+
+/*
+    game
+*/
 
 .game {
   width: var(--gameboard-width-height);
@@ -68,6 +123,10 @@ header h1 {
   border-top: 1px solid rgb(34, 33, 33);
   border-bottom: 1px solid rgb(34, 33, 33);
 }
+
+/*
+    result
+*/
 
 .result {
   display: none;

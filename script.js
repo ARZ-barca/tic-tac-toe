@@ -48,15 +48,15 @@ const gameObj = (() => {
     let block = gameBlocksArray[move]
     block.textContent = turn.mark
     gameArray[move] = turn.mark
-    let result = check(game);
+    let result = check(gameArray);
     if (result) {
-      main.endGame(result)
+      endGame(result)
     }
     turn.next() 
   }
 
   // check for win or draw
-  let check =  () => {
+  let check =  (gameArray) => {
     // horizontal check
     if (gameArray[0] === gameArray[1] && gameArray[0] === gameArray[2] && gameArray[0] !== '') return gameArray[0];
     if (gameArray[3] === gameArray[4] && gameArray[3] === gameArray[5] && gameArray[3] !== '') return gameArray[3];
@@ -93,23 +93,12 @@ const gameObj = (() => {
 }) ()
 
 const players = (() => {
-
-  let player_x, player_o;
-
   // a function to create human player
   let HumanPlayer = (name) => {
     return {name}
   }
 
 
-  // functions to set x and o players
-  function setXplayer(player) {
-    player_x = player
-  }
-
-  function setOplayer(player) {
-    player_o = player
-  }
 
   function createAi(name, algo) {
     return {name, algo}
@@ -119,48 +108,136 @@ const players = (() => {
     
   }
 
-  return {HumanPlayer, setXplayer, setOplayer}
+  return {HumanPlayer}
 }) ()
 
-let main = (() => {
-  let player1 = players.HumanPlayer('alireza')
-  let player2 = players.HumanPlayer('amir')
-
-  function runGame() {
-    let game = document.querySelector('.game')
-    game.innerHTML = ''
-    gameObj.init()
-    gameObj.addEventListeners()
-    players.setXplayer(player1)
-    players.setOplayer(player2)
-    let resultDiv = document.createElement('div')
-    resultDiv.classList.add('result');
-    game.appendChild(resultDiv)
-    resultDiv.textContent = 'aaa'
+const playerSelection = (() => {
+  let player_x, player_o;
+  // functions to set and get x and o players
+  function setXplayer(player) {
+    player_x = player
+    let playerLabelx = document.querySelector('.x-player .name')
+    playerLabelx.textContent = player.name
   }
 
-  function endGame(result) {
-    let game = document.querySelector('.game')
-    let resultDiv = document.querySelector('.result')
-    resultDiv.classList.add('show')
-    if (result === 'draw') {
-      resultDiv.textContent = 'draw'
-    } else if (result === 'X') {
-      resultDiv.textContent = 'X won!'
-    } else if (result === 'O') {
-      resultDiv.textContent = 'O won!'
+  function setOplayer(player) {
+    player_o = player
+    let playerLabelo = document.querySelector('.o-player .name')
+    playerLabelo.textContent = player.name
+  }
+
+  function getXplayer() {
+    return player_x.name
+  }
+
+  function getOplayer() {
+    return player_o.name
+  }
+
+
+  // selecting a player
+
+  let playerXLabel = document.querySelector('.x-player')
+  let playerOLabel = document.querySelector('.o-player')
+
+  playerXLabel.addEventListener('click', addActive)
+  playerOLabel.addEventListener('click', addActive)
+
+  playerXLabel.addEventListener('mouseleave', removeActive)
+  playerOLabel.addEventListener('mouseleave', removeActive)
+
+  function addActive(e) {
+    this.classList.add('active')
+  }
+
+  function removeActive(e) {
+    this.classList.remove('active')
+  }
+
+  // selecting a human player
+  let humanLabelX = document.querySelector('.x-player .human-player')
+  let humanLabelO = document.querySelector('.o-player .human-player')
+  
+  humanLabelX.addEventListener('click', selectHumanPlayerX)
+  humanLabelO.addEventListener('click', selectHumanPlayerO)
+
+  function selectHumanPlayerX(e) {
+    let name = prompt('enter the player name:')
+    if (name === null || name === '') {
+      return
+    }
+    let player = players.HumanPlayer(name)
+    setXplayer(player)
+    checkPlayerSelection()
+  }
+
+  function selectHumanPlayerO(e) {
+    let name = prompt('enter the player name:')
+    if (name === null || name === '') {
+      return
+    }
+    let player = players.HumanPlayer(name)
+    setOplayer(player)
+    checkPlayerSelection()
+  }
+
+  let loserAiX = document.querySelector('.x-player .loser')
+  let loserAiO = document.querySelector('.o-player .loser')
+
+  loserAiX.addEventListener('click', selectLoserX) 
+  loserAiO.addEventListener('click', selectLoserO)
+
+  function selectLoserX() {
+    setXplayer(players.loser)
+    checkPlayerSelection()
+  }
+
+  function selectLoserO() {
+    setOplayer(players.loser)
+    checkPlayerSelection()
+  }
+
+  function checkPlayerSelection() {
+    if (player_x !== undefined && player_o !== undefined) {
+      runGame()
     }
   }
 
-  let resetButton = document.querySelector('.reset')
-  resetButton.addEventListener('click', (e) => {
-    runGame()
-  })
-
-  return {runGame, endGame}
+  return {setOplayer, setXplayer, getXplayer, getOplayer}
 }) ()
 
-main.runGame()
+// main functions
+
+function runGame() {
+  let game = document.querySelector('.game')
+  game.innerHTML = ''
+  gameObj.init()
+  gameObj.addEventListeners()
+  let resultDiv = document.createElement('div')
+  resultDiv.classList.add('result');
+  game.appendChild(resultDiv)
+}
+
+function endGame(result) {
+  let game = document.querySelector('.game')
+  let resultDiv = document.querySelector('.result')
+  resultDiv.classList.add('show')
+  if (result === 'draw') {
+    resultDiv.textContent = 'draw'
+  } else if (result === 'X') {
+    resultDiv.textContent = `${playerSelection.getXplayer()} won!`
+  } else if (result === 'O') {
+    resultDiv.textContent = `${playerSelection.getOplayer()} won!`
+  }
+}
+
+let resetButton = document.querySelector('.reset')
+resetButton.addEventListener('click', (e) => {
+  runGame()
+})
+
+
+//main.runGame()
 
 
 
