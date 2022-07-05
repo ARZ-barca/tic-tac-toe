@@ -34,6 +34,13 @@ const gameObj = (() => {
     }, 
     getCurrentTurn() {
       return this.mark
+    }, 
+    getNextTurnmark() {
+      if (this.mark === 'X') {
+        return 'O'
+      } else {
+        return 'X'
+      }
     }
   }
 
@@ -79,7 +86,6 @@ const gameObj = (() => {
     } else {
       turn.next()
     } 
-    
   }
 
   // check for win or draw
@@ -130,6 +136,7 @@ const players = (() => {
     return {name}
   }
 
+  // loser ai factory function
   let LoserAi = () => {
     let name = 'loser'
     let type = 'ai'
@@ -137,10 +144,14 @@ const players = (() => {
     let getMove = () => {
       let emptyIndexes = gameObj.getEmptyIndexes()
       let gameArrayCopy = gameObj.getGameArrayCopy()
+
+      // checks if there is only one move left
       if (emptyIndexes.length === 1) {
         move = emptyIndexes[0]
         return move
       }
+
+      // checks for ranom moves that dont win the game and dont prevent defeat
       while (true) {
         move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)]
         gameArrayCopy[move] = gameObj.turn.getCurrentTurn()
@@ -156,7 +167,111 @@ const players = (() => {
     return {name, type, getMove}
   }
 
-  return {HumanPlayer, LoserAi}
+  // randy ai factory function
+  let RandyAi = () => {
+    let name = 'randy'
+    let type = 'ai'
+    let move;
+    let getMove = () => {
+      let emptyIndexes = gameObj.getEmptyIndexes()
+      let gameArrayCopy = gameObj.getGameArrayCopy()
+      if (emptyIndexes.length === 1) {
+        move = emptyIndexes[0]
+        return move
+      }
+
+      // checks for winning move
+      for (let m of emptyIndexes) {
+        gameArrayCopy[m] = gameObj.turn.getCurrentTurn()
+        let result = gameObj.check(gameArrayCopy)
+        if (result === gameObj.turn.getCurrentTurn()) {
+          move = m
+          return move
+        }
+        gameArrayCopy[m] = ''
+      }
+
+      // checks for preventing defeat
+      for (let m of emptyIndexes) {
+        gameArrayCopy[m] = gameObj.turn.getNextTurnmark()
+        let result = gameObj.check(gameArrayCopy)
+        if (result === gameObj.turn.getNextTurnmark()) {
+          move = m
+          return move
+        }
+        gameArrayCopy[m] = ''
+      }
+
+      // get a random move
+      move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)]
+      return move  
+    }
+    return {name, type, getMove}
+  }
+  // chad ai factory function
+  let ChadAi = () => {
+    let name = 'chad'
+    let type = 'ai'
+    let move;
+    let getMove = () => {
+      let emptyIndexes = gameObj.getEmptyIndexes()
+      let gameArrayCopy = gameObj.getGameArrayCopy()
+      
+      // checks if there is only one move left
+      if (emptyIndexes.length === 1) {
+        move = emptyIndexes[0]
+        return move
+      }
+
+      // checks for winning move
+      for (let m of emptyIndexes) {
+        gameArrayCopy[m] = gameObj.turn.getCurrentTurn()
+        let result = gameObj.check(gameArrayCopy)
+        if (result === gameObj.turn.getCurrentTurn()) {
+          move = m
+          return move
+        }
+        gameArrayCopy[m] = ''
+      }
+
+      // checks for preventing defeat
+      for (let m of emptyIndexes) {
+        gameArrayCopy[m] = gameObj.turn.getNextTurnmark()
+        let result = gameObj.check(gameArrayCopy)
+        if (result === gameObj.turn.getNextTurnmark()) {
+          move = m
+          return move
+        }
+        gameArrayCopy[m] = ''
+      }
+      
+      // check for center
+      if (emptyIndexes.includes(4)) {
+        move = 4
+        return move
+      }
+
+      // check for corners
+      let freeCorners = []
+      for (let m of emptyIndexes) {
+        if (m === 0 || m === 2 || m === 6 || m === 8) {
+          freeCorners.push(m)
+        }
+      }
+      if (freeCorners.length !== 0) {
+        move = freeCorners[Math.floor(Math.random() * freeCorners.length)]
+        return move
+      }
+
+      // randomly selects remaining sides
+      move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)]
+      return move
+    }
+
+    return {name, type, getMove}
+  }
+
+  return {HumanPlayer, LoserAi, RandyAi, ChadAi}
 }) ()
 
 const playerSelection = (() => {
@@ -229,6 +344,32 @@ const playerSelection = (() => {
     checkPlayerSelection()
   }
 
+  // select randy ai
+
+  let randyAiX = document.querySelector('.x-player .randy')
+  let randyAiO = document.querySelector('.o-player .randy')
+
+  randyAiX.addEventListener('click', selectRandyX) 
+  randyAiO.addEventListener('click', selectRandyO)
+
+  function selectRandyX() {
+    setXplayer(players.RandyAi())
+    checkPlayerSelection()
+  }
+
+  function selectRandyO() {
+    setOplayer(players.RandyAi())
+    checkPlayerSelection()
+  }
+
+  function checkPlayerSelection() {
+    if (player_x !== undefined && player_o !== undefined) {
+      runGame()
+    }
+  }
+
+  // select loser ai
+
   let loserAiX = document.querySelector('.x-player .loser')
   let loserAiO = document.querySelector('.o-player .loser')
 
@@ -244,6 +385,25 @@ const playerSelection = (() => {
     setOplayer(players.LoserAi())
     checkPlayerSelection()
   }
+
+  // select chad ai
+
+  let chadAiX = document.querySelector('.x-player .chad')
+  let chadAiO = document.querySelector('.o-player .chad')
+
+  chadAiX.addEventListener('click', selectChadX) 
+  chadAiO.addEventListener('click', selectChadO)
+
+  function selectChadX() {
+    setXplayer(players.ChadAi())
+    checkPlayerSelection()
+  }
+
+  function selectChadO() {
+    setOplayer(players.ChadAi())
+    checkPlayerSelection()
+  }
+
 
   function checkPlayerSelection() {
     if (player_x !== undefined && player_o !== undefined) {
