@@ -3,14 +3,39 @@ const gameObj = (() => {
   let gameBlocksArray;
   let gameArray = [];
 
-  // an object for determining the turn
-  const turn = {mark: 'X', next() {
-    if (this.mark === 'X') {
-      this.mark = 'O'
-    } else if (this.mark === 'O') {
+  // an object for determining the turn and make ai play it's turn
+  const turn = {init() {
       this.mark = 'X'
+      let playerX = playerSelection.getXplayer()
+      if (playerX.type !== 'ai') {
+        return
+      }
+      move = playerX.getMove()
+      aiPlay(move)
+    },
+    next() {
+      if (this.mark === 'X') {
+        this.mark = 'O'
+        let playerO = playerSelection.getOplayer()
+        if (playerO.type !== 'ai') {
+          return
+        }
+        move = playerO.getMove()
+        aiPlay(move)
+      } else if (this.mark === 'O') {
+        this.mark = 'X'
+        let playerX = playerSelection.getXplayer()
+        if (playerX.type !== 'ai') {
+          return
+        }
+        move = playerX.getMove()
+        aiPlay(move)
+      }
+    }, 
+    getCurrentTurn() {
+      return this.mark
     }
-  }}
+  }
 
   // fill the game object with game blocks and fill the game array with empty string
   let init = () => {
@@ -27,7 +52,7 @@ const gameObj = (() => {
 
   // adds event listener to game blocks
   let addEventListeners = () => {
-    turn.mark = 'X'
+    turn.init()
     for (let i = 0; i < 9; i++) {
       let gameBlock = gameBlocksArray[i]
       gameBlock.addEventListener('click', clickPlay, {once: true})
@@ -51,8 +76,10 @@ const gameObj = (() => {
     let result = check(gameArray);
     if (result) {
       endGame(result)
-    }
-    turn.next() 
+    } else {
+      turn.next()
+    } 
+    
   }
 
   // check for win or draw
@@ -87,9 +114,14 @@ const gameObj = (() => {
         emptyIndexes.push(i)
       }
     }
+    return emptyIndexes
+  }
+
+  let getGameArrayCopy = () => {
+    return JSON.parse(JSON.stringify(gameArray))
   }
   
-  return {init, addEventListeners, aiPlay, check, getEmptyIndexes}
+  return {init, addEventListeners, aiPlay, check, getEmptyIndexes, getGameArrayCopy, turn}
 }) ()
 
 const players = (() => {
@@ -98,17 +130,33 @@ const players = (() => {
     return {name}
   }
 
-
-
-  function createAi(name, algo) {
-    return {name, algo}
+  let LoserAi = () => {
+    let name = 'loser'
+    let type = 'ai'
+    let move;
+    let getMove = () => {
+      let emptyIndexes = gameObj.getEmptyIndexes()
+      let gameArrayCopy = gameObj.getGameArrayCopy()
+      if (emptyIndexes.length === 1) {
+        move = emptyIndexes[0]
+        return move
+      }
+      while (true) {
+        move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)]
+        gameArrayCopy[move] = gameObj.turn.getCurrentTurn()
+        let result = gameObj.check(gameArrayCopy)
+        if (result === 'X' || result === 'O') {
+          gameArrayCopy[move] = ''
+          continue
+        } 
+        break
+      }
+      return move
+    }
+    return {name, type, getMove}
   }
 
-  function loserAlgo(emptyIndexes) {
-    
-  }
-
-  return {HumanPlayer}
+  return {HumanPlayer, LoserAi}
 }) ()
 
 const playerSelection = (() => {
@@ -127,11 +175,11 @@ const playerSelection = (() => {
   }
 
   function getXplayer() {
-    return player_x.name
+    return player_x
   }
 
   function getOplayer() {
-    return player_o.name
+    return player_o
   }
 
 
@@ -188,12 +236,12 @@ const playerSelection = (() => {
   loserAiO.addEventListener('click', selectLoserO)
 
   function selectLoserX() {
-    setXplayer(players.loser)
+    setXplayer(players.LoserAi())
     checkPlayerSelection()
   }
 
   function selectLoserO() {
-    setOplayer(players.loser)
+    setOplayer(players.LoserAi())
     checkPlayerSelection()
   }
 
@@ -211,23 +259,22 @@ const playerSelection = (() => {
 function runGame() {
   let game = document.querySelector('.game')
   game.innerHTML = ''
-  gameObj.init()
-  gameObj.addEventListeners()
   let resultDiv = document.createElement('div')
   resultDiv.classList.add('result');
   game.appendChild(resultDiv)
+  gameObj.init()
+  gameObj.addEventListeners()
 }
 
 function endGame(result) {
-  let game = document.querySelector('.game')
   let resultDiv = document.querySelector('.result')
   resultDiv.classList.add('show')
   if (result === 'draw') {
     resultDiv.textContent = 'draw'
   } else if (result === 'X') {
-    resultDiv.textContent = `${playerSelection.getXplayer()} won!`
+    resultDiv.textContent = `${playerSelection.getXplayer().name} won!`
   } else if (result === 'O') {
-    resultDiv.textContent = `${playerSelection.getOplayer()} won!`
+    resultDiv.textContent = `${playerSelection.getOplayer().name} won!`
   }
 }
 
