@@ -239,6 +239,7 @@ footer a {
   font-size: 1rem;
 }
 
-footer a span {
+footer a span.footer-label {
   line-height: 40px;
+  width: max-content;
 }
