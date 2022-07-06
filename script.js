@@ -417,6 +417,8 @@ const playerSelection = (() => {
 // main functions
 
 function runGame() {
+  let resetButton = document.querySelector('button.reset')
+  resetButton.classList.add('active')
   let game = document.querySelector('.game')
   game.innerHTML = ''
   let resultDiv = document.createElement('div')
@@ -430,11 +432,11 @@ function endGame(result) {
   let resultDiv = document.querySelector('.result')
   resultDiv.classList.add('show')
   if (result === 'draw') {
-    resultDiv.textContent = 'draw'
+    resultDiv.innerHTML = '<span>draw</span>'
   } else if (result === 'X') {
-    resultDiv.textContent = `${playerSelection.getXplayer().name} won!`
+    resultDiv.innerHTML = `<span>${playerSelection.getXplayer().name} won</span>`
   } else if (result === 'O') {
-    resultDiv.textContent = `${playerSelection.getOplayer().name} won!`
+    resultDiv.innerHTML = `<span>${playerSelection.getOplayer().name} won</span>`
   }
 }
 
