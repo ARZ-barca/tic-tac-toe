@@ -242,4 +242,5 @@ footer a {
 footer a span.footer-label {
   line-height: 40px;
   width: max-content;
+  flex-shrink: 0;
 }
