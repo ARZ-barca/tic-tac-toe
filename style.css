@@ -17,7 +17,7 @@
 
 html {
   font-size: 16px;
-  font-family: 'Permanent Marker', cursive;
+  font-family: "Permanent Marker", cursive;
 }
 
 /*
@@ -207,7 +207,6 @@ button.reset:active {
   background-color: rgb(112, 131, 130);
 }
 
-
 button.reset.active {
   display: block;
 }
@@ -215,7 +214,7 @@ button.reset.active {
 /*
     footer
 */
-
+/* 
 footer {
   position: absolute;
   bottom: 5px;
@@ -243,4 +242,4 @@ footer a span.footer-label {
   line-height: 40px;
   width: max-content;
   flex-shrink: 0;
-}
+} */
